@@ -548,7 +548,7 @@ public:
 
         try
         {
-            onSharedValueCreate<true>(*region);
+            onSharedValueCreate(*region);
 
             attempt->value = std::shared_ptr<Value>( //NOLINT: see line 589
                 region->value(),
@@ -595,13 +595,12 @@ private:
         /// Someone decremented metadata refcount to 0 and start deleting from used_regions...
         // can'be now -- onShared locks metadata mutex.
 
-        onSharedValueCreate<false>(metadata);
+        onSharedValueCreate(metadata);
 
         return std::shared_ptr<Value>( // NOLINT: not a nullptr
                 metadata.value(), [this](Value * ptr){ onValueDelete(ptr); });
     }
 
-    template <bool MayBeInUnused>
     void onSharedValueCreate(RegionMetadata& metadata) noexcept
     {
         printf("Thread %lu CRE on %p INIT\n", pthread_self(), static_cast<void*>(metadata.value()));
@@ -634,15 +633,13 @@ private:
             printf("Thread %lu CRE on %p acquired mutex\n", pthread_self(), static_cast<void*>(metadata.value()));
             printf("Thread %lu CRE on %p erasing from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
 
-            if constexpr (MayBeInUnused) {
-                if (metadata.TUnusedRegionHook::is_linked()) {
-                    /// May be absent if the region was created by calling allocateFromFreeRegion.
-                    unused_regions.erase(unused_regions.iterator_to(metadata));
+            if (metadata.TUnusedRegionHook::is_linked()) {
+                /// May be absent if the region was created by calling allocateFromFreeRegion.
+                unused_regions.erase(unused_regions.iterator_to(metadata));
 
-                    printf("Thread %lu CRE on %p erased from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
-                } else {
-                    printf("Thread %lu CRE on %p NOT PRESENT in unused_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
-                }
+                printf("Thread %lu CRE on %p erased from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
+            } else {
+                printf("Thread %lu CRE on %p NOT PRESENT in unused_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
             }
 
             // already present in used_regions (in getOrSet), see line 506
