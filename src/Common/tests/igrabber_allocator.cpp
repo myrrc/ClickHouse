@@ -640,7 +640,8 @@ private:
 
     void onValueDelete(Value * value) noexcept
     {
-        printf("Thread %lu onValueDelete\n", pthread_self());
+        printf("Thread %lu onValueDelete on %p\n", 
+                pthread_self(), value);
 
         RegionMetadata * metadata;
 
@@ -663,7 +664,7 @@ private:
             if (--metadata->refcount != 0)
                 return;
 
-            printf("Thread %lu onValueDelete, metadata refcount decremented to 0\n", pthread_self());
+            printf("Thread %lu onValueDelete on %p, metadata refcount decremented to 0\n", pthread_self(), value);
 
             /// Deleting last reference.
             value_to_region.erase(it);
