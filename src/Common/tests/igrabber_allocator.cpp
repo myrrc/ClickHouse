@@ -698,13 +698,12 @@ private:
         std::lock_guard used(used_regions_mutex);
 
         printf("Thread %lu DEL on %p acquired used_regions_mutex\n", pthread_self(), static_cast<void*>(value));
-        printf("Thread %lu DEL, deleting from used_regions\n", pthread_self());
+        printf("Thread %lu DEL on %p deleting from used_regions\n", pthread_self(), static_cast<void*>(value));
 
         assert(metadata->TUsedRegionHook::is_linked());
         used_regions.erase(used_regions.iterator_to(*metadata));
 
-        printf("Thread %lu DEL, deleted from used_regions\n", pthread_self());
-
+        printf("Thread %lu DEL in %p deleted from used_regions\n", pthread_self(), static_cast<void*>(value));
         printf("Thread %lu DEL on %p EXIT\n", pthread_self(), static_cast<void*>(value));
 
         /// No delete value here because we do not need to (it will be unmmap'd on MemoryChunk disposal).
