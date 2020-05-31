@@ -604,40 +604,46 @@ private:
     template <bool MayBeInUnused>
     void onSharedValueCreate(RegionMetadata& metadata) noexcept
     {
+        printf("Thread %lu CRE on %p INIT\n", pthread_self(), static_cast<void*>(metadata.value()));
+
         std::lock_guard meta_lock(metadata.mutex);
-        printf("Thread %lu onSharedValueCreate\n", pthread_self());
 
-        if (++metadata.refcount != 1)
+        printf("Thread %lu CRE on %p acquired metadata.mutex\n", pthread_self(), static_cast<void*>(metadata.value()));
+
+        if (++metadata.refcount != 1) {
+            printf("Thread %lu CRE on %p EXIT (non first refcount)\n", pthread_self(), static_cast<void*>(metadata.value()));
             return;
+        }
 
-        printf("Thread %lu onSharedValueCreate, metadata refcount incremented to 1\n", pthread_self());
+        printf("Thread %lu CRE on %p metadata refcount incremented to 1\n", pthread_self(), static_cast<void*>(metadata.value()));
 
         {
             std::lock_guard used(used_regions_mutex);
-            printf("Thread %lu onSharedValueCreate on %p, pushing to used_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
+            printf("Thread %lu CRE on %p acquired used_regions_mutex\n", pthread_self(), static_cast<void*>(metadata.value()));
+            printf("Thread %lu CRE on %p pushing to used_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
 
             assert(!metadata.TUsedRegionHook::is_linked());
             used_regions.insert(metadata);
 
-            printf("Thread %lu onSharedValueCreate, pushed to used_regions\n", pthread_self());
+            printf("Thread %lu CRE on %p pushed to used_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
         }
 
         {
             std::lock_guard global(mutex);
 
-            printf("Thread %lu onSharedValueCreate on %p, erasing from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
+            printf("Thread %lu CRE on %p acquired mutex\n", pthread_self(), static_cast<void*>(metadata.value()));
+            printf("Thread %lu CRE on %p erasing from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
 
             if constexpr (MayBeInUnused) {
                 if (metadata.TUnusedRegionHook::is_linked()) {
                     /// May be absent if the region was created by calling allocateFromFreeRegion.
                     unused_regions.erase(unused_regions.iterator_to(metadata));
 
-                    printf("Thread %lu onSharedValueCreate on %p, erased from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
+                    printf("Thread %lu CRE on %p erased from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
                 } else {
-                    printf("Thread %lu onSharedValueCreate on %p, NOT PRESENT in unused_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
+                    printf("Thread %lu CRE on %p NOT PRESENT in unused_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
                 }
             }
-
 
             // already present in used_regions (in getOrSet), see line 506
             value_to_region.emplace(metadata.value(), &metadata);
@@ -649,7 +655,7 @@ private:
 
     void onValueDelete(Value * value) noexcept
     {
-        printf("Thread %lu onValueDelete on %p INIT\n", pthread_self(), static_cast<void*>(value));
+        printf("Thread %lu DEL on %p INIT\n", pthread_self(), static_cast<void*>(value));
 
         RegionMetadata * metadata;
 
@@ -658,7 +664,7 @@ private:
         {
             std::lock_guard global_lock(mutex);
 
-            printf("Thread %lu onValueDelete on %p acquired mutex\n", pthread_self(), static_cast<void*>(value));
+            printf("Thread %lu DEL on %p acquired mutex\n", pthread_self(), static_cast<void*>(value));
 
             auto it = value_to_region.find(value);
 
@@ -669,22 +675,24 @@ private:
             metadata = it->second;
             meta_lock = std::unique_lock(metadata->mutex); ///2. init and lock here
 
-            printf("Thread %lu onValueDelete on %p acquired metadata->mutex\n", pthread_self(), static_cast<void*>(value));
+            printf("Thread %lu DEL on %p acquired metadata->mutex\n", pthread_self(), static_cast<void*>(value));
 
-            if (--metadata->refcount != 0)
+            if (--metadata->refcount != 0) {
+                printf("Thread %lu DEL on %p EXIT (non null refcount)\n", pthread_self(), static_cast<void*>(value));
                 return;
+            }
 
-            printf("Thread %lu onValueDelete on %p metadata refcount decremented to 0\n", pthread_self(), static_cast<void*>(value));
+            printf("Thread %lu DEL on %p metadata refcount decremented to 0\n", pthread_self(), static_cast<void*>(value));
 
             /// Deleting last reference.
             value_to_region.erase(it);
 
-            printf("Thread %lu onValueDelete on %p pushing to unused_regions\n", pthread_self(), static_cast<void*>(value));
+            printf("Thread %lu DEL on %p PUSH INIT to unused_regions\n", pthread_self(), static_cast<void*>(value));
 
             assert(!metadata->TUnusedRegionHook::is_linked());
             unused_regions.push_back(*metadata);
 
-            printf("Thread %lu onValueDelete on %p pushed to unused_regions\n", pthread_self(), static_cast<void*>(value));
+            printf("Thread %lu DEL on %p PUSH FIN to unused_regions\n", pthread_self(), static_cast<void*>(value));
         }
 
         --metadata->chunk->used_refcount; //atomic here.
@@ -692,15 +700,15 @@ private:
 
         std::lock_guard used(used_regions_mutex);
 
-        printf("Thread %lu onValueDelete on %p acquired used_regions_mutex\n", pthread_self(), static_cast<void*>(value));
-        printf("Thread %lu onValueDelete, deleting from used_regions\n", pthread_self());
+        printf("Thread %lu DEL on %p acquired used_regions_mutex\n", pthread_self(), static_cast<void*>(value));
+        printf("Thread %lu DEL, deleting from used_regions\n", pthread_self());
 
         assert(metadata->TUsedRegionHook::is_linked());
         used_regions.erase(used_regions.iterator_to(*metadata));
 
-        printf("Thread %lu onValueDelete, deleted from used_regions\n", pthread_self());
+        printf("Thread %lu DEL, deleted from used_regions\n", pthread_self());
 
-        printf("Thread %lu onValueDelete on %p EXIT\n", pthread_self(), static_cast<void*>(value));
+        printf("Thread %lu DEL on %p EXIT\n", pthread_self(), static_cast<void*>(value));
 
         /// No delete value here because we do not need to (it will be unmmap'd on MemoryChunk disposal).
     }
