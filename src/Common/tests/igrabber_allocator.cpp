@@ -658,8 +658,7 @@ private:
             assert(it != value_to_region.end());
 
             metadata = it->second;
-            meta_lock = std::unique_lock(metadata->mutex); ///2. init here
-            meta_lock.lock(); /// 3. lock here till function end.
+            meta_lock = std::unique_lock(metadata->mutex); ///2. init and lock here
 
             if (--metadata->refcount != 0)
                 return;
