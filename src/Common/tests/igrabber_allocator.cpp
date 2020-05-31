@@ -642,8 +642,7 @@ private:
 
     void onValueDelete(Value * value) noexcept
     {
-        printf("Thread %lu onValueDelete on %p\n", 
-                pthread_self(), static_cast<void*>(value));
+        printf("Thread %lu onValueDelete on %p INIT\n", pthread_self(), static_cast<void*>(value));
 
         RegionMetadata * metadata;
 
@@ -652,7 +651,7 @@ private:
         {
             std::lock_guard global_lock(mutex);
 
-            printf("Thread %lu acquired mutex, 630\n", pthread_self());
+            printf("Thread %lu onValueDelete on %p acquired mutex\n", pthread_self(), static_cast<void*>(value));
 
             auto it = value_to_region.find(value);
 
@@ -663,6 +662,8 @@ private:
             metadata = it->second;
             meta_lock = std::unique_lock(metadata->mutex); ///2. init and lock here
 
+            printf("Thread %lu onValueDelete on %p acquired metadata->mutex\n", pthread_self(), static_cast<void*>(value));
+
             if (--metadata->refcount != 0)
                 return;
 
@@ -671,8 +672,12 @@ private:
             /// Deleting last reference.
             value_to_region.erase(it);
 
+            printf("Thread %lu onValueDelete on %p, pushing to used_regions\n", pthread_self(), static_cast<void*>(value));
+
             assert(!metadata->TUnusedRegionHook::is_linked());
             unused_regions.push_back(*metadata);
+
+            printf("Thread %lu onValueDelete on %p, pushed to used_regions\n", pthread_self(), static_cast<void*>(value));
         }
 
         --metadata->chunk->used_refcount; //atomic here.
@@ -688,6 +693,8 @@ private:
         used_regions.erase(used_regions.iterator_to(*metadata));
 
         printf("Thread %lu onValueDelete, deleted from used_regions\n", pthread_self());
+
+        printf("Thread %lu onValueDelete on %p EXIT\n", pthread_self(), static_cast<void*>(value));
 
         /// No delete value here because we do not need to (it will be unmmap'd on MemoryChunk disposal).
     }
