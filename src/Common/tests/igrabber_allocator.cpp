@@ -627,7 +627,7 @@ private:
 
             printf("Thread %lu onSharedValueCreate on %p, erasing from unused regions\n", pthread_self(), static_cast<void*>(metadata.value()));
 
-            if constexpr (MayBeInUnused)
+            if constexpr (MayBeInUnused) {
                 if (metadata.TUnusedRegionHook::is_linked()) {
                     /// May be absent if the region was created by calling allocateFromFreeRegion.
                     unused_regions.erase(unused_regions.iterator_to(metadata));
@@ -636,6 +636,7 @@ private:
                 } else {
                     printf("Thread %lu onSharedValueCreate on %p, NOT PRESENT in unused_regions\n", pthread_self(), static_cast<void*>(metadata.value()));
                 }
+            }
 
 
             // already present in used_regions (in getOrSet), see line 506
