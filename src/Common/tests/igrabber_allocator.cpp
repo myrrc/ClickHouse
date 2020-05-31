@@ -465,8 +465,8 @@ public:
     template <class Init, class Size>
     inline GetOrSetRet getOrSet(const Key & key, Size && get_size, Init && initialize)
     {
-        //printf("Thread %lu getOrSet %d\n", pthread_self(), key);
-
+        printf("Thread %lu getOrSet %d\n", pthread_self(), key);
+        
         if (ValuePtr out = getImpl(key); out)
         {
             printf("Thread %lu getOrSet found\n", pthread_self());
@@ -475,13 +475,14 @@ public:
             return {out, false}; // value was found in the cache.
         }
 
-        //printf("Thread %lu getOrSet not found\n", pthread_self());
+        printf("Thread %lu getOrSet not found\n", pthread_self());
 
         InsertionAttemptDisposer disposer;
         InsertionAttempt * attempt;
 
         {
             std::lock_guard att_lock(attempts_mutex);
+            printf("Thread %lu getOrSet acquired attempts_mutex\n", pthread_self());
 
             auto & insertion_attempt = insertion_attempts[key];
 
@@ -494,6 +495,7 @@ public:
         attempt = disposer.attempt.get();
 
         std::lock_guard attempt_lock(attempt->mutex);
+        printf("Thread %lu getOrSet acquired attempt->mutex\n", pthread_self());
 
         {
             disposer.attempt_disposed = attempt->is_disposed;
@@ -511,6 +513,8 @@ public:
         }
 
         ++misses;
+
+        printf("Thread %lu getOrSet initializing new value\n", pthread_self());
 
         /// No try-catch here because it is not needed.
         size_t size = get_size();
@@ -546,13 +550,15 @@ public:
             }
         }
 
+        printf("Thread %lu getOrSet on %p initialized new value\n", pthread_self(), static_cast<void*>(region->value()));
+
         try
         {
-            onSharedValueCreate(*region);
-
             attempt->value = std::shared_ptr<Value>( //NOLINT: see line 589
                 region->value(),
                 [this](Value * value) { onValueDelete(value); });
+
+            onSharedValueCreate(*region);
 
             // init attempt value so other threads, being at line 496, could get the value.
 
@@ -577,7 +583,7 @@ public:
 private:
     inline ValuePtr getImpl(const Key& key)
     {
-        //printf("Thread %lu getImpl\n", pthread_self());
+        printf("Thread %lu getImpl\n", pthread_self());
 
         typename decltype(used_regions)::iterator it;
 
