@@ -643,7 +643,7 @@ private:
 
         RegionMetadata * metadata;
 
-        std::unique_lock meta_lock; /// 1. empty here
+        std::unique_lock<std::mutex> meta_lock; /// 1. empty here
 
         {
             std::lock_guard global_lock(mutex);
