@@ -614,7 +614,7 @@ private:
 
         {
             std::lock_guard used(used_regions_mutex);
-            printf("Thread %lu onSharedValueCreate on %p, pushing to used_regions\n", pthread_self() (void *)metadata.value());
+            printf("Thread %lu onSharedValueCreate on %p, pushing to used_regions\n", pthread_self(), (void *)metadata.value());
 
             assert(!metadata.TUsedRegionHook::is_linked());
             used_regions.insert(metadata);
@@ -625,7 +625,7 @@ private:
         {
             std::lock_guard global(mutex);
 
-            printf("Thread %lu onSharedValueCreate on %p, erasing from unused regions\n", pthread_self() (void *)metadata.value());
+            printf("Thread %lu onSharedValueCreate on %p, erasing from unused regions\n", pthread_self(), (void *)metadata.value());
 
             if constexpr (MayBeInUnused)
                 if (metadata.TUnusedRegionHook::is_linked())
