@@ -551,7 +551,8 @@ public:
             onSharedValueCreate<true>(*region);
 
             attempt->value = std::shared_ptr<Value>( //NOLINT: see line 589
-                region->value(), std::bind(&IGrabberAllocator::onValueDelete, this, std::placeholders::_1));
+                region->value(),
+                [this](Value * value) { onValueDelete(value); });
 
             // init attempt value so other threads, being at line 496, could get the value.
 
@@ -657,7 +658,7 @@ private:
             assert(it != value_to_region.end());
 
             metadata = it->second;
-            meta_lock = {metadata->mutex}; ///2. init here
+            meta_lock = std::unique_lock(metadata->mutex); ///2. init here
             meta_lock.lock(); /// 3. lock here till function end.
 
             if (--metadata->refcount != 0)
