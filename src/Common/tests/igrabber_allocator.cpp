@@ -592,6 +592,7 @@ private:
         RegionMetadata& metadata = *it;
 
         /// Someone decremented metadata refcount to 0 and start deleting from used_regions...
+        // can'be now -- onShared locks metadata mutex.
 
         onSharedValueCreate<false>(metadata);
 
@@ -602,25 +603,20 @@ private:
     template <bool MayBeInUnused>
     void onSharedValueCreate(RegionMetadata& metadata) noexcept
     {
-        //printf("Thread %lu onSharedValueCreate\n", pthread_self());
-        std::lock_guard used(used_regions_mutex);
+        std::lock_guard meta_lock(metadata.mutex);
+        printf("Thread %lu onSharedValueCreate\n", pthread_self());
 
-        {
-            std::lock_guard meta_lock(metadata.mutex);
-
-            if (++metadata.refcount != 1)
-                return;
-        }
+        if (++metadata.refcount != 1)
+            return;
 
         printf("Thread %lu onSharedValueCreate, metadata refcount incremented to 1\n", pthread_self());
 
         {
-            //printf("Thread %lu acquired used_regions_mutex, 599\n", pthread_self());
-
+            std::lock_guard used(used_regions_mutex);
             printf("Thread %lu onSharedValueCreate, pushing to used_regions\n", pthread_self());
 
             assert(!metadata.TUsedRegionHook::is_linked());
-            used_regions.insert(metadata); // TODO fails here
+            used_regions.insert(metadata);
 
             printf("Thread %lu onSharedValueCreate, pushed to used_regions\n", pthread_self());
         }
@@ -643,15 +639,16 @@ private:
 
     void onValueDelete(Value * value) noexcept
     {
-        //printf("Thread %lu onValueDelete\n", pthread_self());
+        printf("Thread %lu onValueDelete\n", pthread_self());
 
-        std::lock_guard used(used_regions_mutex);
         RegionMetadata * metadata;
+
+        std::unique_lock meta_lock(); /// 1. empty here
 
         {
             std::lock_guard global_lock(mutex);
 
-            //printf("Thread %lu acquired mutex, 630\n", pthread_self());
+            printf("Thread %lu acquired mutex, 630\n", pthread_self());
 
             auto it = value_to_region.find(value);
 
@@ -660,29 +657,27 @@ private:
             assert(it != value_to_region.end());
 
             metadata = it->second;
+            meta_lock = {metadata->mutex}; ///2. init here
+            meta_lock.lock(); /// 3. lock here till function end.
 
-            {
-                std::lock_guard meta_lock(metadata->mutex);
+            if (--metadata->refcount != 0)
+                return;
 
-                if (--metadata->refcount != 0)
-                    return;
-
-                printf("Thread %lu onValueDelete, metadata refcount decremented to 0\n", pthread_self());
-            }
+            printf("Thread %lu onValueDelete, metadata refcount decremented to 0\n", pthread_self());
 
             /// Deleting last reference.
             value_to_region.erase(it);
 
-            //printf("Thread %lu modifying unused_regions\n", pthread_self());
-
             assert(!metadata->TUnusedRegionHook::is_linked());
-            unused_regions.push_back(*metadata); //TODO Fails here
+            unused_regions.push_back(*metadata);
         }
 
         --metadata->chunk->used_refcount; //atomic here.
         total_size_in_use -= metadata->size;
 
-        //printf("Thread %lu modifying used_regions\n", pthread_self());
+        printf("Thread %lu modifying used_regions\n", pthread_self());
+
+        std::lock_guard used(used_regions_mutex);
 
         printf("Thread %lu onValueDelete, deleting from used_regions\n", pthread_self());
 
