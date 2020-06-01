@@ -466,7 +466,7 @@ public:
     inline GetOrSetRet getOrSet(const Key & key, Size && get_size, Init && initialize)
     {
         printf("Thread %lu getOrSet %d\n", pthread_self(), key);
-        
+
         if (ValuePtr out = getImpl(key); out)
         {
             printf("Thread %lu getOrSet found\n", pthread_self());
@@ -494,7 +494,7 @@ public:
 
         attempt = disposer.attempt.get();
 
-        std::lock_guard attempt_lock(attempt->mutex);
+        std::unique_lock attempt_lock(attempt->mutex);
         printf("Thread %lu getOrSet acquired attempt->mutex\n", pthread_self());
 
         {
@@ -558,6 +558,8 @@ public:
                 region->value(),
                 [this](Value * value) { onValueDelete(value); });
 
+            attempt_lock.unlock(); //maybe ok for parallel init
+
             onSharedValueCreate(*region);
 
             // init attempt value so other threads, being at line 496, could get the value.
@@ -598,8 +600,10 @@ private:
 
         RegionMetadata& metadata = *it;
 
-        /// Someone decremented metadata refcount to 0 and start deleting from used_regions...
-        // can'be now -- onShared locks metadata mutex.
+        /// Someone decremented metadata refcount to 0 and started deleting from used_regions -- opmitization for not
+        /// waiting for a mutex (trading speed for a cache miss).
+        if (metadata.refcount == 0) //atomic strong model, no sync
+            return nullptr;
 
         onSharedValueCreate(metadata);
 
@@ -917,7 +921,7 @@ private:
         size_t size {0};
 
         /// How many outer users reference this object's #value?
-        size_t refcount {0};
+        std::atomic_size_t refcount {0};
 
         /**
          * Used to compare regions (usually MemoryChunk.ptr) and update MemoryChunk's used_refcount
