@@ -479,9 +479,9 @@ public:
 
         attempt = disposer.attempt.get();
 
-        {
-            std::lock_guard attempt_lock(attempt->mutex);
+        std::unique_lock attempt_lock(attempt->mutex);
 
+        {
             disposer.attempt_disposed = attempt->is_disposed;
 
             if (attempt->value)
@@ -495,7 +495,6 @@ public:
                 return {attempt->value, false};
             }
         }
-
 
         ++misses;
 
@@ -535,12 +534,13 @@ public:
 
         try
         {
-            onSharedValueCreate<true>(*region);
-
-            std::lock_guard attempt_lock(attempt->mutex);
-
             attempt->value = std::shared_ptr<Value>( //NOLINT: see line 589
-                region->value(), std::bind(&IGrabberAllocator::onValueDelete, this, std::placeholders::_1));
+                region->value(),
+                [this](Value * value) { onValueDelete(value); });
+
+            attempt_lock.unlock(); //maybe ok for parallel init
+
+            onSharedValueCreate(*region);
 
             // init attempt value so other threads, being at line 496, could get the value.
 
@@ -578,39 +578,39 @@ private:
 
         RegionMetadata& metadata = *it;
 
-        onSharedValueCreate<false>(metadata);
+        /// Someone decremented metadata refcount to 0 and started deleting from used_regions -- opmitization for not
+        /// waiting for a mutex (trading speed for a cache miss).
+        if (metadata.refcount == 0) //atomic strong model, no sync
+            return nullptr;
+
+        onSharedValueCreate(metadata);
 
         return std::shared_ptr<Value>( // NOLINT: not a nullptr
-                metadata.value(), std::bind(&IGrabberAllocator::onValueDelete, this, std::placeholders::_1));
+                metadata.value(), [this](Value * ptr){ onValueDelete(ptr); });
     }
 
-    template <bool MayBeInUnused>
     void onSharedValueCreate(RegionMetadata& metadata) noexcept
     {
-        {
-            std::lock_guard meta_lock(metadata.mutex);
+        std::lock_guard meta_lock(metadata.mutex);
 
-            if (++metadata.refcount != 1)
-                return;
+        if (++metadata.refcount != 1) {
+            return;
         }
 
         {
             std::lock_guard used(used_regions_mutex);
 
-            printf("Thread %lu acquired used_regions_mutex, 599\n",
-                    pthread_self());
-
-            BOOST_ASSERT(!metadata.TUsedRegionHook::is_linked());
-            used_regions.push_back(metadata); // TODO fails here
+            assert(!metadata.TUsedRegionHook::is_linked());
+            used_regions.insert(metadata);
         }
 
         {
             std::lock_guard global(mutex);
 
-            if constexpr (MayBeInUnused)
-                if (metadata.TUnusedRegionHook::is_linked())
-                    /// May be absent if the region was created by calling allocateFromFreeRegion.
-                    unused_regions.erase(unused_regions.iterator_to(metadata));
+            if (metadata.TUnusedRegionHook::is_linked()) {
+                /// May be absent if the region was created by calling allocateFromFreeRegion.
+                unused_regions.erase(unused_regions.iterator_to(metadata));
+            }
 
             // already present in used_regions (in getOrSet), see line 506
             value_to_region.emplace(metadata.value(), &metadata);
@@ -624,35 +624,29 @@ private:
     {
         RegionMetadata * metadata;
 
+        std::unique_lock<std::mutex> meta_lock; /// 1. empty here
+
         {
             std::lock_guard global_lock(mutex);
-
-            printf("Thread %lu acquired mutex, 630\n",
-                    pthread_self());
 
             auto it = value_to_region.find(value);
 
             /// Normally it != value_to_region.end() because there exists at least one shared_ptr using this value (the one
             /// invoking this function), thus value_to_region contains a metadata struct associated with #value.
-            BOOST_ASSERT(it != value_to_region.end());
+            assert(it != value_to_region.end());
 
             metadata = it->second;
+            meta_lock = std::unique_lock(metadata->mutex); ///2. init and lock here
 
-            {
-                std::lock_guard meta_lock(metadata->mutex);
-
-                if (--metadata->refcount != 0)
-                    return;
+            if (--metadata->refcount != 0) {
+                return;
             }
 
             /// Deleting last reference.
             value_to_region.erase(it);
 
-            printf("Thread %lu modifying unused_regions, 651\n",
-                    pthread_self());
-
-            BOOST_ASSERT(!metadata->TUnusedRegionHook::is_linked());
-            unused_regions.push_back(*metadata); //TODO Fails here
+            assert(!metadata->TUnusedRegionHook::is_linked());
+            unused_regions.push_back(*metadata);
         }
 
         --metadata->chunk->used_refcount; //atomic here.
@@ -660,10 +654,7 @@ private:
 
         std::lock_guard used(used_regions_mutex);
 
-        printf("Thread %lu modifying unused_regions, 663\n",
-                pthread_self());
-
-        BOOST_ASSERT(metadata->TUsedRegionHook::is_linked());
+        assert(metadata->TUsedRegionHook::is_linked());
         used_regions.erase(used_regions.iterator_to(*metadata));
 
         /// No delete value here because we do not need to (it will be unmmap'd on MemoryChunk disposal).
@@ -858,7 +849,8 @@ private:
         bool key_initialized{false};
         bool value_initialized{false};
 
-        union {
+        union
+        {
             /// Pointer to a IGrabberAllocator::MemoryChunk part storage for a given region.
             void * ptr {nullptr};
 
@@ -870,7 +862,7 @@ private:
         size_t size {0};
 
         /// How many outer users reference this object's #value?
-        size_t refcount {0};
+        std::atomic_size_t refcount {0};
 
         /**
          * Used to compare regions (usually MemoryChunk.ptr) and update MemoryChunk's used_refcount
