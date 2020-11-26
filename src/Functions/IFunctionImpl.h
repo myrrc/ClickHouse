@@ -1,5 +1,6 @@
 #pragma once
 #include <Functions/IFunction.h>
+#include <common/expected.h>
 
 /// This file contains developer interface for functions.
 /// In order to implement a new function you can choose one of two options:
@@ -122,8 +123,18 @@ public:
 using FunctionBaseImplPtr = std::unique_ptr<IFunctionBaseImpl>;
 
 
+using FuncReturnTypeError = std::pair<std::string, int>; /// message + error code;
+using FuncReturnType = tl::expected<DataTypePtr, FuncReturnTypeError>;
+
+
 class IFunctionOverloadResolverImpl
 {
+private:
+    static inline tl::unexpected<FuncReturnTypeError> returnError(const std::string& message, int errorCode)
+    {
+        return tl::make_unexpected(FuncReturnTypeError(message, errorCode));
+    }
+
 public:
 
     virtual ~IFunctionOverloadResolverImpl() = default;
@@ -132,13 +143,13 @@ public:
 
     virtual FunctionBaseImplPtr build(const ColumnsWithTypeAndName & arguments, const DataTypePtr & result_type) const = 0;
 
-    virtual DataTypePtr getReturnType(const DataTypes & /*arguments*/) const
+    virtual FuncReturnType getReturnType(const DataTypes & /*arguments*/) const
     {
-        throw Exception("getReturnType is not implemented for " + getName(), ErrorCodes::NOT_IMPLEMENTED);
+        return returnError("getReturnType is not implemented for " + getName(), ErrorCodes::NOT_IMPLEMENTED);
     }
 
     /// This function will be called in default implementation. You can overload it or the previous one.
-    virtual DataTypePtr getReturnType(const ColumnsWithTypeAndName & arguments) const
+    virtual FuncReturnType getReturnType(const ColumnsWithTypeAndName & arguments) const
     {
         DataTypes data_types(arguments.size());
         for (size_t i = 0; i < arguments.size(); ++i)
