@@ -69,29 +69,30 @@ public:
     RuleSampleByClause = 29, RuleTtlClause = 30, RuleEngineExpr = 31, RuleTableElementExpr = 32, 
     RuleTableColumnDfnt = 33, RuleTableColumnPropertyExpr = 34, RuleTableIndexDfnt = 35, 
     RuleCodecExpr = 36, RuleCodecArgExpr = 37, RuleTtlExpr = 38, RuleDescribeStmt = 39, 
-    RuleDropStmt = 40, RuleExistsStmt = 41, RuleExplainStmt = 42, RuleInsertStmt = 43, 
-    RuleColumnsClause = 44, RuleDataClause = 45, RuleKillStmt = 46, RuleOptimizeStmt = 47, 
-    RuleRenameStmt = 48, RuleSelectUnionStmt = 49, RuleSelectStmtWithParens = 50, 
-    RuleSelectStmt = 51, RuleWithClause = 52, RuleTopClause = 53, RuleFromClause = 54, 
-    RuleArrayJoinClause = 55, RulePrewhereClause = 56, RuleWhereClause = 57, 
-    RuleGroupByClause = 58, RuleHavingClause = 59, RuleOrderByClause = 60, 
-    RuleLimitByClause = 61, RuleLimitClause = 62, RuleSettingsClause = 63, 
-    RuleJoinExpr = 64, RuleJoinOp = 65, RuleJoinOpCross = 66, RuleJoinConstraintClause = 67, 
-    RuleSampleClause = 68, RuleLimitExpr = 69, RuleOrderExprList = 70, RuleOrderExpr = 71, 
-    RuleRatioExpr = 72, RuleSettingExprList = 73, RuleSettingExpr = 74, 
-    RuleSetStmt = 75, RuleShowStmt = 76, RuleSystemStmt = 77, RuleTruncateStmt = 78, 
-    RuleUseStmt = 79, RuleWatchStmt = 80, RuleColumnTypeExpr = 81, RuleColumnExprList = 82, 
-    RuleColumnsExpr = 83, RuleColumnExpr = 84, RuleColumnArgList = 85, RuleColumnArgExpr = 86, 
-    RuleColumnLambdaExpr = 87, RuleColumnIdentifier = 88, RuleNestedIdentifier = 89, 
-    RuleTableExpr = 90, RuleTableFunctionExpr = 91, RuleTableIdentifier = 92, 
-    RuleTableArgList = 93, RuleTableArgExpr = 94, RuleDatabaseIdentifier = 95, 
-    RuleFloatingLiteral = 96, RuleNumberLiteral = 97, RuleLiteral = 98, 
-    RuleInterval = 99, RuleKeyword = 100, RuleKeywordForAlias = 101, RuleAlias = 102, 
-    RuleIdentifier = 103, RuleIdentifierOrNull = 104, RuleEnumValue = 105
+    RuleDropStmt = 40, RuleDeleteStmt = 41, RuleExistsStmt = 42, RuleExplainStmt = 43, 
+    RuleInsertStmt = 44, RuleColumnsClause = 45, RuleDataClause = 46, RuleKillStmt = 47, 
+    RuleOptimizeStmt = 48, RuleRenameStmt = 49, RuleSelectUnionStmt = 50, 
+    RuleSelectStmtWithParens = 51, RuleSelectStmt = 52, RuleWithClause = 53, 
+    RuleTopClause = 54, RuleFromClause = 55, RuleArrayJoinClause = 56, RulePrewhereClause = 57, 
+    RuleWhereClause = 58, RuleGroupByClause = 59, RuleHavingClause = 60, 
+    RuleOrderByClause = 61, RuleLimitByClause = 62, RuleLimitClause = 63, 
+    RuleSettingsClause = 64, RuleJoinExpr = 65, RuleJoinOp = 66, RuleJoinOpCross = 67, 
+    RuleJoinConstraintClause = 68, RuleSampleClause = 69, RuleLimitExpr = 70, 
+    RuleOrderExprList = 71, RuleOrderExpr = 72, RuleRatioExpr = 73, RuleSettingExprList = 74, 
+    RuleSettingExpr = 75, RuleSetStmt = 76, RuleShowStmt = 77, RuleSystemStmt = 78, 
+    RuleTruncateStmt = 79, RuleUseStmt = 80, RuleWatchStmt = 81, RuleColumnTypeExpr = 82, 
+    RuleColumnExprList = 83, RuleColumnsExpr = 84, RuleColumnExpr = 85, 
+    RuleColumnArgList = 86, RuleColumnArgExpr = 87, RuleColumnLambdaExpr = 88, 
+    RuleColumnIdentifier = 89, RuleNestedIdentifier = 90, RuleTableExpr = 91, 
+    RuleTableFunctionExpr = 92, RuleTableIdentifier = 93, RuleTableArgList = 94, 
+    RuleTableArgExpr = 95, RuleDatabaseIdentifier = 96, RuleFloatingLiteral = 97, 
+    RuleNumberLiteral = 98, RuleLiteral = 99, RuleInterval = 100, RuleKeyword = 101, 
+    RuleKeywordForAlias = 102, RuleAlias = 103, RuleIdentifier = 104, RuleIdentifierOrNull = 105, 
+    RuleEnumValue = 106
   };
 
   ClickHouseParser(antlr4::TokenStream *input);
-  ~ClickHouseParser() override;
+  ~ClickHouseParser();
 
   virtual std::string getGrammarFileName() const override;
   virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
@@ -141,6 +142,7 @@ public:
   class TtlExprContext;
   class DescribeStmtContext;
   class DropStmtContext;
+  class DeleteStmtContext;
   class ExistsStmtContext;
   class ExplainStmtContext;
   class InsertStmtContext;
@@ -220,7 +222,6 @@ public:
     antlr4::tree::TerminalNode *SEMICOLON();
     InsertStmtContext *insertStmt();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -237,6 +238,7 @@ public:
     CreateStmtContext *createStmt();
     DescribeStmtContext *describeStmt();
     DropStmtContext *dropStmt();
+    DeleteStmtContext *deleteStmt();
     ExistsStmtContext *existsStmt();
     ExplainStmtContext *explainStmt();
     KillStmtContext *killStmt();
@@ -249,7 +251,6 @@ public:
     TruncateStmtContext *truncateStmt();
     UseStmtContext *useStmt();
     WatchStmtContext *watchStmt();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -282,7 +283,6 @@ public:
     ClusterClauseContext *clusterClause();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -309,7 +309,6 @@ public:
     PartitionClauseContext *partitionClause();
     antlr4::tree::TerminalNode *FROM();
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -324,7 +323,6 @@ public:
     antlr4::tree::TerminalNode *TO();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -334,7 +332,6 @@ public:
 
     antlr4::tree::TerminalNode *FREEZE();
     PartitionClauseContext *partitionClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -347,7 +344,6 @@ public:
     TableColumnDfntContext *tableColumnDfnt();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -359,7 +355,6 @@ public:
     antlr4::tree::TerminalNode *ORDER();
     antlr4::tree::TerminalNode *BY();
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -369,7 +364,6 @@ public:
 
     antlr4::tree::TerminalNode *REMOVE();
     antlr4::tree::TerminalNode *TTL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -380,7 +374,6 @@ public:
     antlr4::tree::TerminalNode *UPDATE();
     AssignmentExprListContext *assignmentExprList();
     WhereClauseContext *whereClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -395,7 +388,6 @@ public:
     TableColumnPropertyTypeContext *tableColumnPropertyType();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -406,7 +398,6 @@ public:
     antlr4::tree::TerminalNode *DELETE();
     antlr4::tree::TerminalNode *WHERE();
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -420,7 +411,6 @@ public:
     CodecExprContext *codecExpr();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -434,7 +424,6 @@ public:
     antlr4::tree::TerminalNode *STRING_LITERAL();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -446,7 +435,6 @@ public:
     PartitionClauseContext *partitionClause();
     antlr4::tree::TerminalNode *FROM();
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -459,7 +447,6 @@ public:
     NestedIdentifierContext *nestedIdentifier();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -474,7 +461,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     antlr4::tree::TerminalNode *IN();
     PartitionClauseContext *partitionClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -484,7 +470,6 @@ public:
 
     antlr4::tree::TerminalNode *DETACH();
     PartitionClauseContext *partitionClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -497,7 +482,6 @@ public:
     NestedIdentifierContext *nestedIdentifier();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -513,7 +497,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     antlr4::tree::TerminalNode *AFTER();
     NestedIdentifierContext *nestedIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -523,7 +506,6 @@ public:
 
     antlr4::tree::TerminalNode *DROP();
     PartitionClauseContext *partitionClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -538,7 +520,6 @@ public:
     antlr4::tree::TerminalNode *STRING_LITERAL();
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -548,7 +529,6 @@ public:
 
     antlr4::tree::TerminalNode *MODIFY();
     TtlClauseContext *ttlClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -564,7 +544,6 @@ public:
     antlr4::tree::TerminalNode *VOLUME();
     antlr4::tree::TerminalNode *TABLE();
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -580,7 +559,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     antlr4::tree::TerminalNode *AFTER();
     NestedIdentifierContext *nestedIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -595,7 +573,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -609,7 +586,6 @@ public:
     NestedIdentifierContext *nestedIdentifier();
     antlr4::tree::TerminalNode *EQ_SINGLE();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -628,7 +604,6 @@ public:
     antlr4::tree::TerminalNode *MATERIALIZED();
     antlr4::tree::TerminalNode *TTL();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -643,7 +618,6 @@ public:
     ColumnExprContext *columnExpr();
     antlr4::tree::TerminalNode *ID();
     antlr4::tree::TerminalNode *STRING_LITERAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -672,7 +646,6 @@ public:
     antlr4::tree::TerminalNode *DICTIONARY();
     TableIdentifierContext *tableIdentifier();
     ClusterClauseContext *clusterClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -686,7 +659,6 @@ public:
     antlr4::tree::TerminalNode *TABLE();
     TableIdentifierContext *tableIdentifier();
     PartitionClauseContext *partitionClause();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -724,7 +696,6 @@ public:
     UuidClauseContext *uuidClause();
     ClusterClauseContext *clusterClause();
     TableSchemaClauseContext *tableSchemaClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -743,7 +714,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     UuidClauseContext *uuidClause();
     ClusterClauseContext *clusterClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -760,7 +730,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     ClusterClauseContext *clusterClause();
     EngineExprContext *engineExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -784,7 +753,6 @@ public:
     DestinationClauseContext *destinationClause();
     TableSchemaClauseContext *tableSchemaClause();
     antlr4::tree::TerminalNode *DECIMAL_LITERAL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -807,7 +775,6 @@ public:
     ClusterClauseContext *clusterClause();
     TableSchemaClauseContext *tableSchemaClause();
     antlr4::tree::TerminalNode *POPULATE();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -828,7 +795,6 @@ public:
     TableSchemaClauseContext *tableSchemaClause();
     EngineClauseContext *engineClause();
     SubqueryClauseContext *subqueryClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -844,7 +810,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -874,7 +839,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> IS_OBJECT_ID();
     antlr4::tree::TerminalNode* IS_OBJECT_ID(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -898,7 +862,6 @@ public:
     std::vector<DictionarySettingsClauseContext *> dictionarySettingsClause();
     DictionarySettingsClauseContext* dictionarySettingsClause(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -912,7 +875,6 @@ public:
     antlr4::tree::TerminalNode *PRIMARY();
     antlr4::tree::TerminalNode *KEY();
     ColumnExprListContext *columnExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -929,7 +891,6 @@ public:
     LiteralContext *literal();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -950,7 +911,6 @@ public:
     std::vector<DictionaryArgExprContext *> dictionaryArgExpr();
     DictionaryArgExprContext* dictionaryArgExpr(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -968,7 +928,6 @@ public:
     antlr4::tree::TerminalNode* DECIMAL_LITERAL(size_t i);
     antlr4::tree::TerminalNode *MIN();
     antlr4::tree::TerminalNode *MAX();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -989,7 +948,6 @@ public:
     std::vector<DictionaryArgExprContext *> dictionaryArgExpr();
     DictionaryArgExprContext* dictionaryArgExpr(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1008,7 +966,6 @@ public:
     IdentifierContext* identifier(size_t i);
     antlr4::tree::TerminalNode *MAX();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1023,7 +980,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     SettingExprListContext *settingExprList();
     antlr4::tree::TerminalNode *RPAREN();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1040,7 +996,6 @@ public:
     IdentifierContext *identifier();
     antlr4::tree::TerminalNode *STRING_LITERAL();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1053,7 +1008,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *UUID();
     antlr4::tree::TerminalNode *STRING_LITERAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1068,7 +1022,6 @@ public:
     antlr4::tree::TerminalNode *TO();
     TableIdentifierContext *tableIdentifier();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1081,7 +1034,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *AS();
     SelectUnionStmtContext *selectUnionStmt();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1108,7 +1060,6 @@ public:
 
     antlr4::tree::TerminalNode *AS();
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1118,7 +1069,6 @@ public:
 
     antlr4::tree::TerminalNode *AS();
     TableFunctionExprContext *tableFunctionExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1132,7 +1082,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1157,7 +1106,6 @@ public:
     std::vector<SettingsClauseContext *> settingsClause();
     SettingsClauseContext* settingsClause(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1171,7 +1119,6 @@ public:
     antlr4::tree::TerminalNode *PARTITION();
     antlr4::tree::TerminalNode *BY();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1187,7 +1134,6 @@ public:
     antlr4::tree::TerminalNode *KEY();
     ColumnExprContext *columnExpr();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1201,7 +1147,6 @@ public:
     antlr4::tree::TerminalNode *SAMPLE();
     antlr4::tree::TerminalNode *BY();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1219,7 +1164,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1236,7 +1180,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     ColumnExprListContext *columnExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1265,7 +1208,6 @@ public:
     IdentifierContext *identifier();
     antlr4::tree::TerminalNode *CHECK();
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1274,7 +1216,6 @@ public:
     TableElementExprColumnContext(TableElementExprContext *ctx);
 
     TableColumnDfntContext *tableColumnDfnt();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1284,7 +1225,6 @@ public:
 
     antlr4::tree::TerminalNode *INDEX();
     TableIndexDfntContext *tableIndexDfnt();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1303,7 +1243,6 @@ public:
     antlr4::tree::TerminalNode *TTL();
     ColumnExprContext *columnExpr();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1318,7 +1257,6 @@ public:
     antlr4::tree::TerminalNode *DEFAULT();
     antlr4::tree::TerminalNode *MATERIALIZED();
     antlr4::tree::TerminalNode *ALIAS();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1336,7 +1274,6 @@ public:
     ColumnTypeExprContext *columnTypeExpr();
     antlr4::tree::TerminalNode *GRANULARITY();
     antlr4::tree::TerminalNode *DECIMAL_LITERAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1356,7 +1293,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1371,7 +1307,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     ColumnExprListContext *columnExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1390,7 +1325,6 @@ public:
     antlr4::tree::TerminalNode *STRING_LITERAL();
     antlr4::tree::TerminalNode *VOLUME();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1405,7 +1339,6 @@ public:
     antlr4::tree::TerminalNode *DESCRIBE();
     antlr4::tree::TerminalNode *DESC();
     antlr4::tree::TerminalNode *TABLE();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1437,7 +1370,6 @@ public:
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *EXISTS();
     ClusterClauseContext *clusterClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1457,11 +1389,37 @@ public:
     antlr4::tree::TerminalNode *NO();
     antlr4::tree::TerminalNode *DELAY();
     antlr4::tree::TerminalNode *TEMPORARY();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   DropStmtContext* dropStmt();
+
+  class  DeleteStmtContext : public antlr4::ParserRuleContext {
+  public:
+    DeleteStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    DeleteStmtContext() = default;
+    void copyFrom(DeleteStmtContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  DeleteFromTableStmtContext : public DeleteStmtContext {
+  public:
+    DeleteFromTableStmtContext(DeleteStmtContext *ctx);
+
+    antlr4::tree::TerminalNode *DELETE();
+    antlr4::tree::TerminalNode *FROM();
+    TableIdentifierContext *tableIdentifier();
+    antlr4::tree::TerminalNode *WHERE();
+    WhereClauseContext *whereClause();
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  DeleteStmtContext* deleteStmt();
 
   class  ExistsStmtContext : public antlr4::ParserRuleContext {
   public:
@@ -1486,7 +1444,6 @@ public:
     antlr4::tree::TerminalNode *TABLE();
     antlr4::tree::TerminalNode *VIEW();
     antlr4::tree::TerminalNode *TEMPORARY();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1497,7 +1454,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     antlr4::tree::TerminalNode *DATABASE();
     DatabaseIdentifierContext *databaseIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1510,7 +1466,6 @@ public:
     antlr4::tree::TerminalNode *EXPLAIN();
     antlr4::tree::TerminalNode *SYNTAX();
     QueryContext *query();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1531,7 +1486,6 @@ public:
     antlr4::tree::TerminalNode *TABLE();
     ColumnsClauseContext *columnsClause();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1548,7 +1502,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1574,7 +1527,6 @@ public:
     DataClauseValuesContext(DataClauseContext *ctx);
 
     antlr4::tree::TerminalNode *VALUES();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1584,7 +1536,6 @@ public:
 
     antlr4::tree::TerminalNode *FORMAT();
     IdentifierContext *identifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1595,7 +1546,6 @@ public:
     SelectUnionStmtContext *selectUnionStmt();
     antlr4::tree::TerminalNode *EOF();
     antlr4::tree::TerminalNode *SEMICOLON();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1625,7 +1575,6 @@ public:
     antlr4::tree::TerminalNode *SYNC();
     antlr4::tree::TerminalNode *ASYNC();
     antlr4::tree::TerminalNode *TEST();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1642,7 +1591,6 @@ public:
     PartitionClauseContext *partitionClause();
     antlr4::tree::TerminalNode *FINAL();
     antlr4::tree::TerminalNode *DEDUPLICATE();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1664,7 +1612,6 @@ public:
     antlr4::tree::TerminalNode* COMMA(size_t i);
     ClusterClauseContext *clusterClause();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1682,7 +1629,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> ALL();
     antlr4::tree::TerminalNode* ALL(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1697,7 +1643,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     SelectUnionStmtContext *selectUnionStmt();
     antlr4::tree::TerminalNode *RPAREN();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1730,7 +1675,6 @@ public:
     antlr4::tree::TerminalNode *CUBE();
     antlr4::tree::TerminalNode *ROLLUP();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1743,7 +1687,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *WITH();
     ColumnExprListContext *columnExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1760,7 +1703,6 @@ public:
     antlr4::tree::TerminalNode *WITH();
     antlr4::tree::TerminalNode *TIES();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1773,7 +1715,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *FROM();
     JoinExprContext *joinExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1791,7 +1732,6 @@ public:
     antlr4::tree::TerminalNode *LEFT();
     antlr4::tree::TerminalNode *INNER();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1805,7 +1745,6 @@ public:
     antlr4::tree::TerminalNode *PREWHERE();
     ColumnExprContext *columnExpr();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1818,7 +1757,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *WHERE();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1838,7 +1776,6 @@ public:
     antlr4::tree::TerminalNode *CUBE();
     antlr4::tree::TerminalNode *ROLLUP();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1851,7 +1788,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *HAVING();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1866,7 +1802,6 @@ public:
     antlr4::tree::TerminalNode *ORDER();
     antlr4::tree::TerminalNode *BY();
     OrderExprListContext *orderExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1883,7 +1818,6 @@ public:
     antlr4::tree::TerminalNode *BY();
     ColumnExprListContext *columnExprList();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1899,7 +1833,6 @@ public:
     antlr4::tree::TerminalNode *WITH();
     antlr4::tree::TerminalNode *TIES();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -1912,7 +1845,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *SETTINGS();
     SettingExprListContext *settingExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -1944,7 +1876,6 @@ public:
     JoinOpContext *joinOp();
     antlr4::tree::TerminalNode *GLOBAL();
     antlr4::tree::TerminalNode *LOCAL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1955,7 +1886,6 @@ public:
     TableExprContext *tableExpr();
     antlr4::tree::TerminalNode *FINAL();
     SampleClauseContext *sampleClause();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1966,7 +1896,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     JoinExprContext *joinExpr();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -1977,7 +1906,6 @@ public:
     std::vector<JoinExprContext *> joinExpr();
     JoinExprContext* joinExpr(size_t i);
     JoinOpCrossContext *joinOpCross();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2004,7 +1932,6 @@ public:
     antlr4::tree::TerminalNode *OUTER();
     antlr4::tree::TerminalNode *ALL();
     antlr4::tree::TerminalNode *ANY();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2016,7 +1943,6 @@ public:
     antlr4::tree::TerminalNode *ALL();
     antlr4::tree::TerminalNode *ANY();
     antlr4::tree::TerminalNode *ASOF();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2032,7 +1958,6 @@ public:
     antlr4::tree::TerminalNode *ANTI();
     antlr4::tree::TerminalNode *ANY();
     antlr4::tree::TerminalNode *ASOF();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2047,7 +1972,6 @@ public:
     antlr4::tree::TerminalNode *GLOBAL();
     antlr4::tree::TerminalNode *LOCAL();
     antlr4::tree::TerminalNode *COMMA();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2065,7 +1989,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2080,7 +2003,6 @@ public:
     std::vector<RatioExprContext *> ratioExpr();
     RatioExprContext* ratioExpr(size_t i);
     antlr4::tree::TerminalNode *OFFSET();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2097,7 +2019,6 @@ public:
     antlr4::tree::TerminalNode *COMMA();
     antlr4::tree::TerminalNode *OFFSET();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2112,7 +2033,6 @@ public:
     OrderExprContext* orderExpr(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2134,7 +2054,6 @@ public:
     antlr4::tree::TerminalNode *FIRST();
     antlr4::tree::TerminalNode *LAST();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2148,7 +2067,6 @@ public:
     std::vector<NumberLiteralContext *> numberLiteral();
     NumberLiteralContext* numberLiteral(size_t i);
     antlr4::tree::TerminalNode *SLASH();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2165,7 +2083,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2180,7 +2097,6 @@ public:
     antlr4::tree::TerminalNode *EQ_SINGLE();
     LiteralContext *literal();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2193,7 +2109,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *SET();
     SettingExprListContext *settingExprList();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2222,7 +2137,6 @@ public:
     antlr4::tree::TerminalNode *CREATE();
     antlr4::tree::TerminalNode *DATABASE();
     DatabaseIdentifierContext *databaseIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2232,7 +2146,6 @@ public:
 
     antlr4::tree::TerminalNode *SHOW();
     antlr4::tree::TerminalNode *DATABASES();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2245,7 +2158,6 @@ public:
     TableIdentifierContext *tableIdentifier();
     antlr4::tree::TerminalNode *TEMPORARY();
     antlr4::tree::TerminalNode *TABLE();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2263,7 +2175,6 @@ public:
     LimitClauseContext *limitClause();
     antlr4::tree::TerminalNode *FROM();
     antlr4::tree::TerminalNode *IN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2275,7 +2186,6 @@ public:
     antlr4::tree::TerminalNode *DICTIONARIES();
     antlr4::tree::TerminalNode *FROM();
     DatabaseIdentifierContext *databaseIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2287,7 +2197,6 @@ public:
     antlr4::tree::TerminalNode *CREATE();
     antlr4::tree::TerminalNode *DICTIONARY();
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2315,7 +2224,6 @@ public:
     antlr4::tree::TerminalNode *SYNC();
     antlr4::tree::TerminalNode *REPLICA();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2334,7 +2242,6 @@ public:
     antlr4::tree::TerminalNode *EXISTS();
     ClusterClauseContext *clusterClause();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2347,7 +2254,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *USE();
     DatabaseIdentifierContext *databaseIdentifier();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2364,7 +2270,6 @@ public:
     antlr4::tree::TerminalNode *EVENTS();
     antlr4::tree::TerminalNode *LIMIT();
     antlr4::tree::TerminalNode *DECIMAL_LITERAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2397,7 +2302,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2409,7 +2313,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     ColumnExprListContext *columnExprList();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2418,7 +2321,6 @@ public:
     ColumnTypeExprSimpleContext(ColumnTypeExprContext *ctx);
 
     IdentifierContext *identifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2433,7 +2335,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2448,7 +2349,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2462,7 +2362,6 @@ public:
     ColumnsExprContext* columnsExpr(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2488,7 +2387,6 @@ public:
     ColumnsExprColumnContext(ColumnsExprContext *ctx);
 
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2499,7 +2397,6 @@ public:
     antlr4::tree::TerminalNode *ASTERISK();
     TableIdentifierContext *tableIdentifier();
     antlr4::tree::TerminalNode *DOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2510,7 +2407,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     SelectUnionStmtContext *selectUnionStmt();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2537,7 +2433,6 @@ public:
     ColumnExprContext* columnExpr(size_t i);
     antlr4::tree::TerminalNode *QUERY();
     antlr4::tree::TerminalNode *COLON();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2549,7 +2444,6 @@ public:
     AliasContext *alias();
     antlr4::tree::TerminalNode *AS();
     IdentifierContext *identifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2563,7 +2457,6 @@ public:
     antlr4::tree::TerminalNode *FROM();
     ColumnExprContext *columnExpr();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2573,7 +2466,6 @@ public:
 
     antlr4::tree::TerminalNode *DASH();
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2584,7 +2476,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     SelectUnionStmtContext *selectUnionStmt();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2593,7 +2484,6 @@ public:
     ColumnExprLiteralContext(ColumnExprContext *ctx);
 
     LiteralContext *literal();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2604,7 +2494,6 @@ public:
     antlr4::tree::TerminalNode *LBRACKET();
     antlr4::tree::TerminalNode *RBRACKET();
     ColumnExprListContext *columnExprList();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2619,7 +2508,6 @@ public:
     antlr4::tree::TerminalNode *FROM();
     antlr4::tree::TerminalNode *RPAREN();
     antlr4::tree::TerminalNode *FOR();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2633,7 +2521,6 @@ public:
     antlr4::tree::TerminalNode *AS();
     ColumnTypeExprContext *columnTypeExpr();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2644,7 +2531,6 @@ public:
     std::vector<ColumnExprContext *> columnExpr();
     ColumnExprContext* columnExpr(size_t i);
     antlr4::tree::TerminalNode *OR();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2657,7 +2543,6 @@ public:
     antlr4::tree::TerminalNode *ASTERISK();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PERCENT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2670,7 +2555,6 @@ public:
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *DASH();
     antlr4::tree::TerminalNode *CONCAT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2692,7 +2576,6 @@ public:
     antlr4::tree::TerminalNode *ILIKE();
     antlr4::tree::TerminalNode *GLOBAL();
     antlr4::tree::TerminalNode *NOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2703,7 +2586,6 @@ public:
     antlr4::tree::TerminalNode *INTERVAL();
     ColumnExprContext *columnExpr();
     IntervalContext *interval();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2715,7 +2597,6 @@ public:
     antlr4::tree::TerminalNode *IS();
     antlr4::tree::TerminalNode *NULL_SQL();
     antlr4::tree::TerminalNode *NOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2732,7 +2613,6 @@ public:
     antlr4::tree::TerminalNode *BOTH();
     antlr4::tree::TerminalNode *LEADING();
     antlr4::tree::TerminalNode *TRAILING();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2743,7 +2623,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     ColumnExprListContext *columnExprList();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2755,7 +2634,6 @@ public:
     ColumnExprContext* columnExpr(size_t i);
     antlr4::tree::TerminalNode *LBRACKET();
     antlr4::tree::TerminalNode *RBRACKET();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2768,7 +2646,6 @@ public:
     antlr4::tree::TerminalNode *BETWEEN();
     antlr4::tree::TerminalNode *AND();
     antlr4::tree::TerminalNode *NOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2779,7 +2656,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     ColumnExprContext *columnExpr();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2789,7 +2665,6 @@ public:
 
     antlr4::tree::TerminalNode *TIMESTAMP();
     antlr4::tree::TerminalNode *STRING_LITERAL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2800,7 +2675,6 @@ public:
     std::vector<ColumnExprContext *> columnExpr();
     ColumnExprContext* columnExpr(size_t i);
     antlr4::tree::TerminalNode *AND();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2811,7 +2685,6 @@ public:
     ColumnExprContext *columnExpr();
     antlr4::tree::TerminalNode *DOT();
     antlr4::tree::TerminalNode *DECIMAL_LITERAL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2828,7 +2701,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> THEN();
     antlr4::tree::TerminalNode* THEN(size_t i);
     antlr4::tree::TerminalNode *ELSE();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2838,7 +2710,6 @@ public:
 
     antlr4::tree::TerminalNode *DATE();
     antlr4::tree::TerminalNode *STRING_LITERAL();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2848,7 +2719,6 @@ public:
 
     antlr4::tree::TerminalNode *NOT();
     ColumnExprContext *columnExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2857,7 +2727,6 @@ public:
     ColumnExprIdentifierContext(ColumnExprContext *ctx);
 
     ColumnIdentifierContext *columnIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2873,7 +2742,6 @@ public:
     antlr4::tree::TerminalNode *DISTINCT();
     ColumnArgListContext *columnArgList();
     ColumnExprListContext *columnExprList();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2884,7 +2752,6 @@ public:
     antlr4::tree::TerminalNode *ASTERISK();
     TableIdentifierContext *tableIdentifier();
     antlr4::tree::TerminalNode *DOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2899,7 +2766,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2912,7 +2778,6 @@ public:
     virtual size_t getRuleIndex() const override;
     ColumnLambdaExprContext *columnLambdaExpr();
     ColumnExprContext *columnExpr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2933,7 +2798,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2948,7 +2812,6 @@ public:
     TableIdentifierContext *tableIdentifier();
     antlr4::tree::TerminalNode *DOT();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -2962,7 +2825,6 @@ public:
     std::vector<IdentifierContext *> identifier();
     IdentifierContext* identifier(size_t i);
     antlr4::tree::TerminalNode *DOT();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -2988,7 +2850,6 @@ public:
     TableExprIdentifierContext(TableExprContext *ctx);
 
     TableIdentifierContext *tableIdentifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -2999,7 +2860,6 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     SelectUnionStmtContext *selectUnionStmt();
     antlr4::tree::TerminalNode *RPAREN();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -3011,7 +2871,6 @@ public:
     AliasContext *alias();
     antlr4::tree::TerminalNode *AS();
     IdentifierContext *identifier();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -3020,7 +2879,6 @@ public:
     TableExprFunctionContext(TableExprContext *ctx);
 
     TableFunctionExprContext *tableFunctionExpr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -3035,7 +2893,6 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     TableArgListContext *tableArgList();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3049,7 +2906,6 @@ public:
     IdentifierContext *identifier();
     DatabaseIdentifierContext *databaseIdentifier();
     antlr4::tree::TerminalNode *DOT();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3066,7 +2922,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3081,7 +2936,6 @@ public:
     TableFunctionExprContext *tableFunctionExpr();
     LiteralContext *literal();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3093,7 +2947,6 @@ public:
     DatabaseIdentifierContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     IdentifierContext *identifier();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3110,7 +2963,6 @@ public:
     std::vector<antlr4::tree::TerminalNode *> DECIMAL_LITERAL();
     antlr4::tree::TerminalNode* DECIMAL_LITERAL(size_t i);
     antlr4::tree::TerminalNode *OCTAL_LITERAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3131,7 +2983,6 @@ public:
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *DASH();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3145,7 +2996,6 @@ public:
     NumberLiteralContext *numberLiteral();
     antlr4::tree::TerminalNode *STRING_LITERAL();
     antlr4::tree::TerminalNode *NULL_SQL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3165,7 +3015,6 @@ public:
     antlr4::tree::TerminalNode *MONTH();
     antlr4::tree::TerminalNode *QUARTER();
     antlr4::tree::TerminalNode *YEAR();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3346,7 +3195,6 @@ public:
     antlr4::tree::TerminalNode *WHERE();
     antlr4::tree::TerminalNode *WITH();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3362,7 +3210,6 @@ public:
     antlr4::tree::TerminalNode *ID();
     antlr4::tree::TerminalNode *KEY();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3375,7 +3222,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     KeywordForAliasContext *keywordForAlias();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3391,7 +3237,6 @@ public:
     IntervalContext *interval();
     KeywordContext *keyword();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -3404,7 +3249,6 @@ public:
     virtual size_t getRuleIndex() const override;
     IdentifierContext *identifier();
     antlr4::tree::TerminalNode *NULL_SQL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -3419,7 +3263,6 @@ public:
     antlr4::tree::TerminalNode *STRING_LITERAL();
     antlr4::tree::TerminalNode *EQ_SINGLE();
     NumberLiteralContext *numberLiteral();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    

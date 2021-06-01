@@ -13,6 +13,7 @@ set (SRCS
     AST/DDLQuery.cpp
     AST/DescribeQuery.cpp
     AST/DropQuery.cpp
+    AST/DeleteQuery.cpp
     AST/EngineExpr.cpp
     AST/ExistsQuery.cpp
     AST/ExplainQuery.cpp
