@@ -164,8 +164,6 @@ public:
 
     virtual antlrcpp::Any visitDropTableStmt(ClickHouseParser::DropTableStmtContext *context) = 0;
 
-    virtual antlrcpp::Any visitDeleteFromTableStmt(ClickHouseParser::DeleteFromTableStmtContext *context) = 0;
-
     virtual antlrcpp::Any visitExistsDatabaseStmt(ClickHouseParser::ExistsDatabaseStmtContext *context) = 0;
 
     virtual antlrcpp::Any visitExistsTableStmt(ClickHouseParser::ExistsTableStmtContext *context) = 0;
