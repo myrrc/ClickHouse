@@ -2,14 +2,12 @@
 
 #include <Databases/IDatabase.h>
 #include <Interpreters/IInterpreter.h>
-#include <Parsers/New/ASTDeleteQuery.h>
+#include <Parsers/ASTDeleteQuery.h>
 #include <Parsers/IAST_fwd.h>
 
 namespace DB
 {
 class Context;
-using DatabaseAndTable = std::pair<DatabasePtr, StoragePtr>;
-class AccessRightsElements;
 
 class InterpreterDeleteQuery : public IInterpreter, WithMutableContext
 {
@@ -18,5 +16,8 @@ public:
 
     /// Drop table or database.
     BlockIO execute() override;
+
+private:
+    ASTPtr query_ptr;
 };
 }
