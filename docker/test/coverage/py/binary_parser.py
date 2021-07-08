@@ -14,4 +14,9 @@ class BinaryParser:
         return unpack("<I" if self.is_le else ">I", data)[0]
 
     def read_str(self, f):
-        return f.read(self.read_uint32(f) * 4).rstrip(b"\0").decode("utf-8")
+        l = self.read_uint32(f)
+        d = f.read(l * 4)
+
+        print(l * 4, d)
+
+        return d.rstrip(b"\0").decode("utf-8")

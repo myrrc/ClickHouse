@@ -200,7 +200,7 @@ void Writer::mergeAndWriteHeader(const LocalCaches& caches)
 
         report_file_pos += path_word_len;
 
-        ptr[++report_file_pos] = instrumented_blocks.size();
+        ptr[report_file_pos] = instrumented_blocks.size(); // no increment here as already on empty position
 
         for (BBIndex index : instrumented_blocks)
         {

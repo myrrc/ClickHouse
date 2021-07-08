@@ -17,8 +17,16 @@ class CCRParser(BinaryParser):
             self.read_header(f)
             self.read_tests(f)
 
+        tests_names = None
+
         with open(tests_file, "r") as f:
-            self.read_tests_names(f)
+            tests_names = f.readlines().split()
+
+        if len(tests_names) != len(self.tests):
+            raise Exception("Corrupt report file")
+
+        for name, test in zip(tests_names, self.tests):
+            test[0] = name
 
         return self.files, self.tests, self.bb
 
@@ -37,6 +45,8 @@ class CCRParser(BinaryParser):
         for _ in range(files_count):
             file_path = self.read_str(f)
             bb_count = self.read_uint32(f)
+
+            print(file_path, len(file_path), bb_count)
 
             file_path = os.path.normpath(file_path)
             file_blocks = []
@@ -65,14 +75,13 @@ class CCRParser(BinaryParser):
             raise Exception("Corrupted file")
 
         while True:
-            test_name = self.read_str(f)
             hit_bb = []
 
             while True:
                 try:
                     token = self.read_uint32(f)
                 except Exception:
-                    self.append(test_name, hit_bb)
+                    self.append("", hit_bb)
                     return
 
                 if token == test_entry_magic:
@@ -80,4 +89,4 @@ class CCRParser(BinaryParser):
 
                 hit_bb.append(token)
 
-            self.append(test_name, hit_bb)
+            self.append("", hit_bb)
