@@ -46,8 +46,6 @@ class CCRParser(BinaryParser):
             file_path = self.read_str(f)
             bb_count = self.read_uint32(f)
 
-            print(file_path, len(file_path), bb_count)
-
             file_path = os.path.normpath(file_path)
             file_blocks = []
 
